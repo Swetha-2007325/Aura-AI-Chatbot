@@ -4,8 +4,11 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
-# OpenAI client — key loaded from environment
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+# Replit-managed AI proxy — no personal API key needed
+client = OpenAI(
+    base_url=os.environ["AI_INTEGRATIONS_OPENAI_BASE_URL"],
+    api_key=os.environ["AI_INTEGRATIONS_OPENAI_API_KEY"],
+)
 
 @app.route("/")
 def index():
@@ -29,7 +32,7 @@ def chat():
         return jsonify({"reply": reply})
 
     except Exception as e:
-        print(f"[OpenAI ERROR] {e}")
+        print(f"[AI ERROR] {e}")
         return jsonify({"error": "Could not get a response. Please try again."}), 500
 
 if __name__ == "__main__":
