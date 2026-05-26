@@ -7,6 +7,10 @@ const menuBtn     = document.getElementById("menuBtn");
 const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
 
+// Hugging Face model and endpoint (called directly from the browser)
+const HF_MODEL  = "mistralai/Mistral-7B-Instruct-v0.3";
+const HF_API_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}/v1/chat/completions`;
+
 let chatSessions = [];   // [{id, title, messages:[]}]
 let currentId    = null;
 
@@ -62,7 +66,7 @@ async function sendMessage() {
     messagesEl.innerHTML = "";
   }
 
-  // Init session if needed
+  // Init a new session if this is the first message
   if (!currentId) {
     currentId = Date.now();
     chatSessions.unshift({ id: currentId, title: text.slice(0, 40), messages: [] });
@@ -76,28 +80,43 @@ async function sendMessage() {
   inputEl.value = "";
   inputEl.style.height = "auto";
   sendBtn.disabled = true;
-
   renderHistory();
 
-  // Typing indicator
+  // Show typing indicator while waiting for the response
   const typingId = appendTyping();
 
   try {
-    const res  = await fetch("/chat", {
+    // Call Hugging Face Inference API directly from the browser
+    const res = await fetch(HF_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: session.messages }),
+      headers: {
+        "Authorization": `Bearer ${HF_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: HF_MODEL,
+        messages: session.messages,  // full conversation history for context
+        max_tokens: 1024,
+      }),
     });
-    const data = await res.json();
+
     removeTyping(typingId);
 
-    const reply = data.reply || "Sorry, something went wrong.";
-    session.messages.push({ role: "assistant", content: reply });
-    appendBubble("ai", reply);
-    renderHistory();
-  } catch {
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("[HF API ERROR]", res.status, err);
+      appendBubble("ai", `Error ${res.status}: Could not get a response. Please try again.`);
+    } else {
+      const data  = await res.json();
+      const reply = data.choices[0].message.content;
+      session.messages.push({ role: "assistant", content: reply });
+      appendBubble("ai", reply);
+      renderHistory();
+    }
+  } catch (err) {
     removeTyping(typingId);
-    appendBubble("ai", "Connection error. Please try again.");
+    console.error("[HF API ERROR]", err);
+    appendBubble("ai", "Connection error. Please check your internet and try again.");
   }
 
   sendBtn.disabled = false;
@@ -156,7 +175,9 @@ function loadSession(id) {
   currentId = id;
   const session = chatSessions.find(s => s.id === id);
   messagesEl.innerHTML = "";
-  session.messages.forEach(m => appendBubble(m.role === "assistant" ? "ai" : m.role, m.content));
+  session.messages.forEach(m =>
+    appendBubble(m.role === "assistant" ? "ai" : m.role, m.content)
+  );
   document.querySelector(".topbar-title").textContent = session.title;
   renderHistory();
   closeSidebar();

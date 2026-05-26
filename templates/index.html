@@ -55,11 +55,15 @@
           </svg>
         </button>
       </div>
-      <p class="disclaimer">This is a demo — responses are randomly generated.</p>
+      <p class="disclaimer">Powered by Mistral-7B via Hugging Face</p>
     </div>
 
   </main>
 
+  <!-- Inject API key from Flask so the browser can call HF directly -->
+  <script>
+    const HF_API_KEY = "{{ hf_api_key }}";
+  </script>
   <script src="/static/script.js"></script>
 </body>
 </html>
