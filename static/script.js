@@ -7,10 +7,6 @@ const menuBtn     = document.getElementById("menuBtn");
 const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
 
-// Hugging Face model and endpoint (called directly from the browser)
-const HF_MODEL  = "mistralai/Mistral-7B-Instruct-v0.3";
-const HF_API_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}/v1/chat/completions`;
-
 let chatSessions = [];   // [{id, title, messages:[]}]
 let currentId    = null;
 
@@ -86,37 +82,27 @@ async function sendMessage() {
   const typingId = appendTyping();
 
   try {
-    // Call Hugging Face Inference API directly from the browser
-    const res = await fetch(HF_API_URL, {
+    // Send full conversation history to Flask, which calls OpenAI
+    const res = await fetch("/chat", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${HF_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: HF_MODEL,
-        messages: session.messages,  // full conversation history for context
-        max_tokens: 1024,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: session.messages }),
     });
 
     removeTyping(typingId);
 
+    const data = await res.json();
     if (!res.ok) {
-      const err = await res.text();
-      console.error("[HF API ERROR]", res.status, err);
-      appendBubble("ai", `Error ${res.status}: Could not get a response. Please try again.`);
+      appendBubble("ai", data.error || "Something went wrong. Please try again.");
     } else {
-      const data  = await res.json();
-      const reply = data.choices[0].message.content;
+      const reply = data.reply;
       session.messages.push({ role: "assistant", content: reply });
       appendBubble("ai", reply);
       renderHistory();
     }
   } catch (err) {
     removeTyping(typingId);
-    console.error("[HF API ERROR]", err);
-    appendBubble("ai", "Connection error. Please check your internet and try again.");
+    appendBubble("ai", "Connection error. Please try again.");
   }
 
   sendBtn.disabled = false;
