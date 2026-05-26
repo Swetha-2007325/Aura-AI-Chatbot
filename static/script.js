@@ -6,8 +6,9 @@ const overlay     = document.getElementById("overlay");
 const menuBtn     = document.getElementById("menuBtn");
 const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
+const topbarTitle = document.getElementById("topbarTitle");
 
-let chatSessions = [];   // [{id, title, messages:[]}]
+let chatSessions = [];
 let currentId    = null;
 
 // ── Sidebar toggle ──────────────────────────────────────
@@ -25,29 +26,57 @@ function closeSidebar() {
 newChatBtn.addEventListener("click", startNewChat);
 function startNewChat() {
   currentId = null;
-  messagesEl.innerHTML = `
-    <div class="welcome">
-      <div class="welcome-icon">&#128214;</div>
-      <h2>How can I help you today?</h2>
-      <p>Ask me anything — I'm here to chat.</p>
-    </div>`;
-  document.querySelector(".topbar-title").textContent = "New Conversation";
+  showWelcome();
+  topbarTitle.textContent = "New Conversation";
   renderHistory();
   closeSidebar();
   inputEl.focus();
 }
 
-// ── Auto-resize textarea ────────────────────────────────
+function showWelcome() {
+  messagesEl.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-glow"></div>
+      <div class="welcome-orb">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+          <path d="M12 8v4l3 3"/>
+        </svg>
+      </div>
+      <h1>Good to see you.</h1>
+      <p>Ask me anything — I think clearly, respond fast,<br>and remember our conversation.</p>
+      <div class="welcome-chips">
+        <button class="chip" data-prompt="Explain quantum computing simply">Explain quantum computing</button>
+        <button class="chip" data-prompt="Write a short poem about the ocean">Write me a poem</button>
+        <button class="chip" data-prompt="Give me 5 productivity tips">Productivity tips</button>
+      </div>
+    </div>`;
+
+  // Wire up chip buttons
+  messagesEl.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      inputEl.value = chip.dataset.prompt;
+      updateSendBtn();
+      sendMessage();
+    });
+  });
+}
+
+// ── Send button enabled state ───────────────────────────
+function updateSendBtn() {
+  sendBtn.disabled = inputEl.value.trim() === "";
+}
 inputEl.addEventListener("input", () => {
   inputEl.style.height = "auto";
   inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + "px";
+  updateSendBtn();
 });
 
 // ── Send on Enter (Shift+Enter = newline) ───────────────
 inputEl.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
-    sendMessage();
+    if (!sendBtn.disabled) sendMessage();
   }
 });
 sendBtn.addEventListener("click", sendMessage);
@@ -57,20 +86,18 @@ async function sendMessage() {
   const text = inputEl.value.trim();
   if (!text) return;
 
-  // Clear welcome screen on first message
   if (messagesEl.querySelector(".welcome")) {
     messagesEl.innerHTML = "";
   }
 
-  // Init a new session if this is the first message
   if (!currentId) {
     currentId = Date.now();
-    chatSessions.unshift({ id: currentId, title: text.slice(0, 40), messages: [] });
+    chatSessions.unshift({ id: currentId, title: text.slice(0, 42), messages: [] });
   }
 
   const session = chatSessions.find(s => s.id === currentId);
   session.messages.push({ role: "user", content: text });
-  document.querySelector(".topbar-title").textContent = session.title;
+  topbarTitle.textContent = session.title;
 
   appendBubble("user", text);
   inputEl.value = "";
@@ -78,34 +105,30 @@ async function sendMessage() {
   sendBtn.disabled = true;
   renderHistory();
 
-  // Show typing indicator while waiting for the response
   const typingId = appendTyping();
 
   try {
-    // Send full conversation history to Flask, which calls OpenAI
     const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: session.messages }),
     });
-
     removeTyping(typingId);
 
     const data = await res.json();
     if (!res.ok) {
       appendBubble("ai", data.error || "Something went wrong. Please try again.");
     } else {
-      const reply = data.reply;
-      session.messages.push({ role: "assistant", content: reply });
-      appendBubble("ai", reply);
+      session.messages.push({ role: "assistant", content: data.reply });
+      appendBubble("ai", data.reply);
       renderHistory();
     }
-  } catch (err) {
+  } catch {
     removeTyping(typingId);
     appendBubble("ai", "Connection error. Please try again.");
   }
 
-  sendBtn.disabled = false;
+  updateSendBtn();
   inputEl.focus();
 }
 
@@ -113,11 +136,9 @@ async function sendMessage() {
 function appendBubble(role, text) {
   const row    = document.createElement("div");
   row.className = `msg-row ${role}`;
-
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   bubble.textContent = text;
-
   row.appendChild(bubble);
   messagesEl.appendChild(row);
   scrollBottom();
@@ -137,8 +158,7 @@ function appendTyping() {
 }
 
 function removeTyping(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
+  document.getElementById(id)?.remove();
 }
 
 function scrollBottom() {
@@ -164,7 +184,10 @@ function loadSession(id) {
   session.messages.forEach(m =>
     appendBubble(m.role === "assistant" ? "ai" : m.role, m.content)
   );
-  document.querySelector(".topbar-title").textContent = session.title;
+  topbarTitle.textContent = session.title;
   renderHistory();
   closeSidebar();
 }
+
+// ── Init ────────────────────────────────────────────────
+showWelcome();
