@@ -1,9 +1,14 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from openai import OpenAI
+from huggingface_hub import InferenceClient
 
 app = Flask(__name__)
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+client = InferenceClient(
+    provider="hf-inference",
+    api_key=os.environ["HUGGINGFACE_API_KEY"],
+)
+
+MODEL = "mistralai/Mistral-7B-Instruct-v0.3"
 
 @app.route("/")
 def index():
@@ -18,7 +23,7 @@ def chat():
         return jsonify({"error": "No messages provided"}), 400
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=MODEL,
         messages=messages,
         max_tokens=1024,
     )
