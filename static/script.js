@@ -69,7 +69,7 @@ async function sendMessage() {
   }
 
   const session = chatSessions.find(s => s.id === currentId);
-  session.messages.push({ role: "user", text });
+  session.messages.push({ role: "user", content: text });
   document.querySelector(".topbar-title").textContent = session.title;
 
   appendBubble("user", text);
@@ -86,13 +86,13 @@ async function sendMessage() {
     const res  = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text }),
+      body: JSON.stringify({ messages: session.messages }),
     });
     const data = await res.json();
     removeTyping(typingId);
 
     const reply = data.reply || "Sorry, something went wrong.";
-    session.messages.push({ role: "ai", text: reply });
+    session.messages.push({ role: "assistant", content: reply });
     appendBubble("ai", reply);
     renderHistory();
   } catch {
@@ -156,7 +156,7 @@ function loadSession(id) {
   currentId = id;
   const session = chatSessions.find(s => s.id === id);
   messagesEl.innerHTML = "";
-  session.messages.forEach(m => appendBubble(m.role, m.text));
+  session.messages.forEach(m => appendBubble(m.role === "assistant" ? "ai" : m.role, m.content));
   document.querySelector(".topbar-title").textContent = session.title;
   renderHistory();
   closeSidebar();
