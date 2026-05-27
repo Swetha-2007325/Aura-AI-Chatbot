@@ -8,8 +8,10 @@ const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
 const topbarTitle = document.getElementById("topbarTitle");
 
+// In-memory sessions: [{conv_id, title, messages:[]}]
+// Seeded from the server on page load, then updated as the user chats.
 let chatSessions = [];
-let currentId    = null;
+let currentConvId = null;  // active conversation ID
 
 // ── Sidebar toggle ──────────────────────────────────────
 menuBtn.addEventListener("click", () => {
@@ -25,7 +27,7 @@ function closeSidebar() {
 // ── New chat ────────────────────────────────────────────
 newChatBtn.addEventListener("click", startNewChat);
 function startNewChat() {
-  currentId = null;
+  currentConvId = null;
   showWelcome();
   topbarTitle.textContent = "New Conversation";
   renderHistory();
@@ -52,7 +54,6 @@ function showWelcome() {
       </div>
     </div>`;
 
-  // Wire up chip buttons
   messagesEl.querySelectorAll(".chip").forEach(chip => {
     chip.addEventListener("click", () => {
       inputEl.value = chip.dataset.prompt;
@@ -62,7 +63,7 @@ function showWelcome() {
   });
 }
 
-// ── Send button enabled state ───────────────────────────
+// ── Send button state ───────────────────────────────────
 function updateSendBtn() {
   sendBtn.disabled = inputEl.value.trim() === "";
 }
@@ -86,16 +87,22 @@ async function sendMessage() {
   const text = inputEl.value.trim();
   if (!text) return;
 
+  // Clear welcome screen on first message
   if (messagesEl.querySelector(".welcome")) {
     messagesEl.innerHTML = "";
   }
 
-  if (!currentId) {
-    currentId = Date.now();
-    chatSessions.unshift({ id: currentId, title: text.slice(0, 42), messages: [] });
+  // Start a new conversation if none is active
+  if (!currentConvId) {
+    currentConvId = crypto.randomUUID();  // unique ID for this thread
+    chatSessions.unshift({
+      conv_id:  currentConvId,
+      title:    text.slice(0, 42),
+      messages: [],
+    });
   }
 
-  const session = chatSessions.find(s => s.id === currentId);
+  const session = chatSessions.find(s => s.conv_id === currentConvId);
   session.messages.push({ role: "user", content: text });
   topbarTitle.textContent = session.title;
 
@@ -111,7 +118,11 @@ async function sendMessage() {
     const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: session.messages }),
+      body: JSON.stringify({
+        messages: session.messages,
+        conv_id:  session.conv_id,
+        title:    session.title,
+      }),
     });
     removeTyping(typingId);
 
@@ -165,21 +176,21 @@ function scrollBottom() {
   messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" });
 }
 
-// ── History sidebar ─────────────────────────────────────
+// ── Sidebar history ─────────────────────────────────────
 function renderHistory() {
   historyList.innerHTML = "";
   chatSessions.forEach(s => {
     const li = document.createElement("li");
     li.textContent = s.title || "New Chat";
-    if (s.id === currentId) li.classList.add("active");
-    li.addEventListener("click", () => loadSession(s.id));
+    if (s.conv_id === currentConvId) li.classList.add("active");
+    li.addEventListener("click", () => loadSession(s.conv_id));
     historyList.appendChild(li);
   });
 }
 
-function loadSession(id) {
-  currentId = id;
-  const session = chatSessions.find(s => s.id === id);
+function loadSession(convId) {
+  currentConvId = convId;
+  const session = chatSessions.find(s => s.conv_id === convId);
   messagesEl.innerHTML = "";
   session.messages.forEach(m =>
     appendBubble(m.role === "assistant" ? "ai" : m.role, m.content)
@@ -189,5 +200,26 @@ function loadSession(id) {
   closeSidebar();
 }
 
+// ── Load history from server on page load ───────────────
+async function loadHistoryFromServer() {
+  try {
+    const res  = await fetch("/history");
+    const data = await res.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      // Populate chatSessions with server data (newest first)
+      chatSessions = data.map(conv => ({
+        conv_id:  conv.conv_id,
+        title:    conv.title,
+        messages: conv.messages,
+      }));
+      renderHistory();
+    }
+  } catch (e) {
+    console.warn("Could not load history:", e);
+  }
+}
+
 // ── Init ────────────────────────────────────────────────
 showWelcome();
+loadHistoryFromServer();

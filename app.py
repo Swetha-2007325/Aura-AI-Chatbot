@@ -1,12 +1,16 @@
 import os
 import json
+import uuid
 from datetime import datetime, timezone
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
+
+# Secret key for signing session cookies (stored in Replit Secrets)
+app.secret_key = os.environ["SESSION_SECRET"]
 
 # ── Replit-managed AI proxy ──────────────────────────────
 client = OpenAI(
@@ -15,25 +19,35 @@ client = OpenAI(
 )
 
 # ── Firebase init ────────────────────────────────────────
-# Parse the service account JSON stored in the secret
 service_account_info = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT_JSON"])
 cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
+def get_user_id():
+    """Return this browser's persistent user ID, creating one if first visit."""
+    if "user_id" not in session:
+        session["user_id"] = str(uuid.uuid4())
+    return session["user_id"]
+
+
 @app.route("/")
 def index():
+    get_user_id()  # ensure user_id is set in the session cookie
     return render_template("index.html")
 
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
+    user_id = get_user_id()
+    data     = request.get_json()
     messages = data.get("messages", [])
+    conv_id  = data.get("conv_id")   # unique ID for this conversation thread
+    title    = data.get("title", "")  # first message used as conversation title
 
-    if not messages:
-        return jsonify({"error": "No messages provided"}), 400
+    if not messages or not conv_id:
+        return jsonify({"error": "Missing messages or conv_id"}), 400
 
     user_message = messages[-1]["content"]
 
@@ -45,10 +59,13 @@ def chat():
         )
         reply = response.choices[0].message.content
 
-        # Save the exchange to Firestore "chats" collection
+        # Save this exchange to Firestore, tagged with user + conversation
         db.collection("chats").add({
-            "user": user_message,
-            "ai": reply,
+            "user_id":   user_id,
+            "conv_id":   conv_id,
+            "title":     title or user_message[:60],
+            "user":      user_message,
+            "ai":        reply,
             "timestamp": datetime.now(timezone.utc),
         })
 
@@ -61,14 +78,38 @@ def chat():
 
 @app.route("/history", methods=["GET"])
 def history():
-    # Return all chats sorted by timestamp
-    docs = db.collection("chats").order_by("timestamp").stream()
-    result = []
-    for doc in docs:
-        entry = doc.to_dict()
-        # Convert Firestore timestamp to ISO string for JSON serialisation
-        entry["timestamp"] = entry["timestamp"].isoformat()
-        result.append(entry)
+    """Return this user's conversations, grouped by conv_id."""
+    user_id = get_user_id()
+
+    # Fetch all messages belonging to this user (sort in Python to avoid
+    # needing a Firestore composite index on user_id + timestamp)
+    docs = db.collection("chats").where("user_id", "==", user_id).stream()
+
+    # Sort by timestamp in Python (avoids needing a composite Firestore index)
+    entries = sorted(
+        [doc.to_dict() for doc in docs],
+        key=lambda e: e.get("timestamp") or 0,
+    )
+
+    # Group individual message pairs into conversations
+    conversations = {}  # conv_id → {title, messages[]}
+    for entry in entries:
+        cid     = entry["conv_id"]
+        if cid not in conversations:
+            conversations[cid] = {
+                "conv_id":  cid,
+                "title":    entry.get("title", entry["user"][:60]),
+                "messages": [],
+            }
+        conversations[cid]["messages"].append(
+            {"role": "user",      "content": entry["user"]}
+        )
+        conversations[cid]["messages"].append(
+            {"role": "assistant", "content": entry["ai"]}
+        )
+
+    # Return newest conversations first
+    result = list(reversed(list(conversations.values())))
     return jsonify(result)
 
 
