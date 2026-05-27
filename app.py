@@ -3,7 +3,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from flask import Flask, render_template, request, jsonify, session
-from openai import OpenAI
+from google import genai
 import firebase_admin
 from firebase_admin import credentials, firestore
 
@@ -12,10 +12,11 @@ app = Flask(__name__)
 # Secret key for signing session cookies (stored in Replit Secrets)
 app.secret_key = os.environ["SESSION_SECRET"]
 
-# ── Replit-managed AI proxy ──────────────────────────────
-client = OpenAI(
-    base_url=os.environ["AI_INTEGRATIONS_OPENAI_BASE_URL"],
-    api_key=os.environ["AI_INTEGRATIONS_OPENAI_API_KEY"],
+# ── Google Gemini setup ──────────────────────────────────
+# Use the stable v1 API so gemini-1.5-flash is available
+gemini = genai.Client(
+    api_key=os.environ["GEMINI_API_KEY"],
+    http_options={"api_version": "v1"},
 )
 
 # ── Firebase init ────────────────────────────────────────
@@ -52,12 +53,22 @@ def chat():
     user_message = messages[-1]["content"]
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            max_tokens=1024,
+        # Convert message history to Gemini format.
+        # Gemini uses "model" instead of "assistant" for AI turns.
+        contents = [
+            {
+                "role": "user" if m["role"] == "user" else "model",
+                "parts": [{"text": m["content"]}],
+            }
+            for m in messages
+        ]
+
+        # Call Gemini and get the reply text
+        result = gemini.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=contents,
         )
-        reply = response.choices[0].message.content
+        reply = result.text
 
         # Save this exchange to Firestore, tagged with user + conversation
         db.collection("chats").add({
