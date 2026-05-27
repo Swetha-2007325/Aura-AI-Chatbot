@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aura · AI Chat</title>
+  <title>Aura AI · Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -11,73 +11,76 @@
 </head>
 <body>
 
-  <!-- Animated background -->
+  <!-- Animated background mesh -->
   <div class="bg-gradient"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
+
+      <!-- Logo -->
       <div class="logo">
-        <span class="logo-orb"></span>
-        Aura
+        <div class="logo-mark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">Aura AI</span>
+          <span class="logo-sub">Powered by Groq</span>
+        </div>
       </div>
+
       <button class="new-chat-btn" id="newChatBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
         New conversation
       </button>
     </div>
 
-    <div class="history-label">Recent</div>
+    <div class="history-label">Conversations</div>
     <ul class="history-list" id="historyList"></ul>
 
     <div class="sidebar-footer">
-      <span>GPT-4o-mini · Firestore</span>
+      <span class="footer-dot"></span>
+      Llama 3.3-70B · Groq
     </div>
   </aside>
 
-  <!-- Overlay for mobile -->
+  <!-- Mobile overlay -->
   <div class="overlay" id="overlay"></div>
 
-  <!-- Main -->
+  <!-- Main content -->
   <main class="main">
 
     <!-- Top bar -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
       </button>
       <span class="topbar-title" id="topbarTitle">New Conversation</span>
-      <div class="topbar-badge">AI</div>
+      <div class="topbar-badge">Groq</div>
     </header>
 
     <!-- Messages -->
-    <div class="messages" id="messages">
-      <div class="welcome">
-        <div class="welcome-glow"></div>
-        <div class="welcome-orb">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
-        </div>
-        <h1>Good to see you.</h1>
-        <p>Ask me anything — I think clearly, respond fast,<br>and remember our conversation.</p>
-        <div class="welcome-chips">
-          <button class="chip" data-prompt="Explain quantum computing simply">Explain quantum computing</button>
-          <button class="chip" data-prompt="Write a short poem about the ocean">Write me a poem</button>
-          <button class="chip" data-prompt="Give me 5 productivity tips">Productivity tips</button>
-        </div>
-      </div>
-    </div>
+    <div class="messages" id="messages"></div>
 
-    <!-- Input area -->
-    <div class="input-area">
-      <div class="input-wrapper" id="inputWrapper">
-        <textarea id="userInput" placeholder="Ask anything…" rows="1"></textarea>
-        <button id="sendBtn" class="send-btn" title="Send message" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
+    <!-- Input -->
+    <div class="input-area-wrap">
+      <div class="input-area">
+        <div class="input-wrapper" id="inputWrapper">
+          <textarea id="userInput" placeholder="Message Aura AI…" rows="1"></textarea>
+          <button id="sendBtn" class="send-btn" title="Send" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+        <p class="disclaimer">Aura AI can make mistakes. Conversations are saved to your account.</p>
       </div>
-      <p class="disclaimer">Aura can make mistakes. Conversations saved to Firestore.</p>
     </div>
 
   </main>

@@ -8,7 +8,7 @@ const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
 const topbarTitle = document.getElementById("topbarTitle");
 
-// Simple UUID generator that works in any context (no HTTPS required)
+// Simple UUID generator (no HTTPS required)
 function makeId() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0;
@@ -17,9 +17,8 @@ function makeId() {
 }
 
 // In-memory sessions: [{conv_id, title, messages:[]}]
-// Seeded from the server on page load, then updated as the user chats.
-let chatSessions = [];
-let currentConvId = null;  // active conversation ID
+let chatSessions  = [];
+let currentConvId = null;
 
 // ── Sidebar toggle ──────────────────────────────────────
 menuBtn.addEventListener("click", () => {
@@ -27,6 +26,7 @@ menuBtn.addEventListener("click", () => {
   overlay.classList.toggle("show");
 });
 overlay.addEventListener("click", closeSidebar);
+
 function closeSidebar() {
   sidebar.classList.remove("open");
   overlay.classList.remove("show");
@@ -34,6 +34,7 @@ function closeSidebar() {
 
 // ── New chat ────────────────────────────────────────────
 newChatBtn.addEventListener("click", startNewChat);
+
 function startNewChat() {
   currentConvId = null;
   showWelcome();
@@ -43,25 +44,38 @@ function startNewChat() {
   inputEl.focus();
 }
 
+// ── Welcome / empty state ───────────────────────────────
 function showWelcome() {
   messagesEl.innerHTML = `
     <div class="welcome">
       <div class="welcome-glow"></div>
+
       <div class="welcome-orb">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
-          <path d="M12 8v4l3 3"/>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
         </svg>
       </div>
-      <h1>Good to see you.</h1>
-      <p>Ask me anything — I think clearly, respond fast,<br>and remember our conversation.</p>
+
+      <h1>Hello, I'm Aura AI.</h1>
+      <p class="welcome-greeting">How can I assist you today?<br>I think clearly, respond fast, and remember our conversations.</p>
+
       <div class="welcome-chips">
-        <button class="chip" data-prompt="Explain quantum computing simply">Explain quantum computing</button>
-        <button class="chip" data-prompt="Write a short poem about the ocean">Write me a poem</button>
-        <button class="chip" data-prompt="Give me 5 productivity tips">Productivity tips</button>
+        <button class="chip" data-prompt="Explain quantum computing in simple terms">
+          ⚡ Explain quantum computing
+        </button>
+        <button class="chip" data-prompt="Write a short poem about the ocean">
+          ✦ Write me a poem
+        </button>
+        <button class="chip" data-prompt="Give me 5 actionable productivity tips">
+          📋 Productivity tips
+        </button>
+        <button class="chip" data-prompt="What are the biggest trends in AI right now?">
+          🤖 AI trends 2025
+        </button>
       </div>
     </div>`;
 
+  // Wire chip buttons to auto-send
   messagesEl.querySelectorAll(".chip").forEach(chip => {
     chip.addEventListener("click", () => {
       inputEl.value = chip.dataset.prompt;
@@ -75,13 +89,14 @@ function showWelcome() {
 function updateSendBtn() {
   sendBtn.disabled = inputEl.value.trim() === "";
 }
+
 inputEl.addEventListener("input", () => {
   inputEl.style.height = "auto";
   inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + "px";
   updateSendBtn();
 });
 
-// ── Send on Enter (Shift+Enter = newline) ───────────────
+// ── Keyboard shortcut: Enter to send, Shift+Enter = newline ──
 inputEl.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -95,17 +110,17 @@ async function sendMessage() {
   const text = inputEl.value.trim();
   if (!text) return;
 
-  // Clear welcome screen on first message
+  // Remove welcome screen on first message
   if (messagesEl.querySelector(".welcome")) {
     messagesEl.innerHTML = "";
   }
 
-  // Start a new conversation if none is active
+  // Create a new conversation if one isn't active
   if (!currentConvId) {
-    currentConvId = makeId();  // unique ID for this thread
+    currentConvId = makeId();
     chatSessions.unshift({
       conv_id:  currentConvId,
-      title:    text.slice(0, 42),
+      title:    text.slice(0, 44),
       messages: [],
     });
   }
@@ -124,17 +139,18 @@ async function sendMessage() {
 
   try {
     const res = await fetch("/chat", {
-      method: "POST",
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      body:    JSON.stringify({
         messages: session.messages,
         conv_id:  session.conv_id,
         title:    session.title,
       }),
     });
-    removeTyping(typingId);
 
+    removeTyping(typingId);
     const data = await res.json();
+
     if (!res.ok) {
       appendBubble("ai", data.error || "Something went wrong. Please try again.");
     } else {
@@ -144,7 +160,7 @@ async function sendMessage() {
     }
   } catch {
     removeTyping(typingId);
-    appendBubble("ai", "Connection error. Please try again.");
+    appendBubble("ai", "Connection error. Please check your network and try again.");
   }
 
   updateSendBtn();
@@ -152,13 +168,31 @@ async function sendMessage() {
 }
 
 // ── DOM helpers ─────────────────────────────────────────
+
+// Aura avatar SVG used inside AI bubbles
+const AVATAR_SVG = `
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"
+       stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>`;
+
 function appendBubble(role, text) {
-  const row    = document.createElement("div");
+  const row = document.createElement("div");
   row.className = `msg-row ${role}`;
+
+  // Show the Aura avatar icon to the left of every AI reply
+  if (role === "ai") {
+    const avatar = document.createElement("div");
+    avatar.className = "ai-avatar";
+    avatar.innerHTML = AVATAR_SVG;
+    row.appendChild(avatar);
+  }
+
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   bubble.textContent = text;
   row.appendChild(bubble);
+
   messagesEl.appendChild(row);
   scrollBottom();
 }
@@ -168,9 +202,18 @@ function appendTyping() {
   const row = document.createElement("div");
   row.className = "msg-row ai";
   row.id = id;
-  row.innerHTML = `<div class="bubble"><div class="typing-dots">
-    <span></span><span></span><span></span>
-  </div></div>`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "ai-avatar";
+  avatar.innerHTML = AVATAR_SVG;
+  row.appendChild(avatar);
+
+  row.innerHTML += `<div class="bubble">
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>`;
+
   messagesEl.appendChild(row);
   scrollBottom();
   return id;
@@ -215,7 +258,6 @@ async function loadHistoryFromServer() {
     const data = await res.json();
 
     if (Array.isArray(data) && data.length > 0) {
-      // Populate chatSessions with server data (newest first)
       chatSessions = data.map(conv => ({
         conv_id:  conv.conv_id,
         title:    conv.title,
