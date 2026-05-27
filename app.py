@@ -59,13 +59,22 @@ def chat():
 
     try:
         # ── Call the Groq API ────────────────────────────
-        # Groq accepts the same message format as OpenAI:
-        # [{"role": "user"/"assistant", "content": "..."}]
+        # System prompt keeps Aura concise — added fresh each call, not stored.
+        system_prompt = {
+            "role": "system",
+            "content": (
+                "You are Aura AI, a concise and professional assistant. "
+                "Keep responses short, clear, modern, and under 80 words "
+                "unless the user explicitly asks for a detailed explanation."
+            ),
+        }
+
         response = groq_client.chat.completions.create(
             model=GROQ_MODEL,
-            messages=messages,
-            max_tokens=1024,
-            timeout=30,  # fail fast if Groq doesn't respond within 30 seconds
+            messages=[system_prompt] + messages,
+            max_tokens=120,   # cap output for clean, readable replies
+            temperature=0.7,  # balanced — not too random, not too dry
+            timeout=30,       # fail fast if Groq doesn't respond in time
         )
 
         reply = response.choices[0].message.content

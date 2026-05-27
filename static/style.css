@@ -454,6 +454,8 @@ body { display: flex; position: relative; }
   font-size: 14.5px;
   line-height: 1.75;
   word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;   /* preserves newlines from the AI */
   letter-spacing: -.01em;
 }
 
