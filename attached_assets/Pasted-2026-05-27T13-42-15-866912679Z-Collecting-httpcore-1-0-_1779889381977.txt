@@ -1,0 +1,100 @@
+2026-05-27T13:42:15.866912679Z Collecting httpcore==1.0.9 (from -r requirements.txt (line 37))
+2026-05-27T13:42:15.879858472Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2026-05-27T13:42:15.898681322Z Collecting httplib2==0.31.2 (from -r requirements.txt (line 38))
+2026-05-27T13:42:15.911516762Z   Downloading httplib2-0.31.2-py3-none-any.whl.metadata (2.2 kB)
+2026-05-27T13:42:15.93364689Z Collecting httpx==0.28.1 (from -r requirements.txt (line 39))
+2026-05-27T13:42:15.946498281Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2026-05-27T13:42:16.000675839Z Collecting huggingface_hub==1.16.1 (from -r requirements.txt (line 40))
+2026-05-27T13:42:16.013464999Z   Downloading huggingface_hub-1.16.1-py3-none-any.whl.metadata (14 kB)
+2026-05-27T13:42:16.044434953Z Collecting hyperframe==6.1.0 (from -r requirements.txt (line 41))
+2026-05-27T13:42:16.056741101Z   Downloading hyperframe-6.1.0-py3-none-any.whl.metadata (4.3 kB)
+2026-05-27T13:42:16.073604075Z Collecting idna==3.16 (from -r requirements.txt (line 42))
+2026-05-27T13:42:16.085816201Z   Downloading idna-3.16-py3-none-any.whl.metadata (6.4 kB)
+2026-05-27T13:42:16.101436377Z Collecting itsdangerous==2.2.0 (from -r requirements.txt (line 43))
+2026-05-27T13:42:16.113386706Z   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+2026-05-27T13:42:16.130787353Z Collecting Jinja2==3.1.6 (from -r requirements.txt (line 44))
+2026-05-27T13:42:16.143629694Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+2026-05-27T13:42:16.223984174Z Collecting jiter==0.15.0 (from -r requirements.txt (line 45))
+2026-05-27T13:42:16.236809474Z   Downloading jiter-0.15.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+2026-05-27T13:42:16.255663305Z Collecting markdown-it-py==4.2.0 (from -r requirements.txt (line 46))
+2026-05-27T13:42:16.268003534Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+2026-05-27T13:42:16.324465955Z Collecting MarkupSafe==3.0.3 (from -r requirements.txt (line 47))
+2026-05-27T13:42:16.336591009Z   Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+2026-05-27T13:42:16.349581463Z Collecting mdurl==0.1.2 (from -r requirements.txt (line 48))
+2026-05-27T13:42:16.362467594Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2026-05-27T13:42:16.424565017Z Collecting msgpack==1.1.2 (from -r requirements.txt (line 49))
+2026-05-27T13:42:16.43746982Z   Downloading msgpack-1.1.2-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.1 kB)
+2026-05-27T13:42:16.49346009Z Collecting openai==2.38.0 (from -r requirements.txt (line 50))
+2026-05-27T13:42:16.505905271Z   Downloading openai-2.38.0-py3-none-any.whl.metadata (31 kB)
+2026-05-27T13:42:16.528030628Z Collecting packaging==26.2 (from -r requirements.txt (line 51))
+2026-05-27T13:42:16.540181683Z   Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+2026-05-27T13:42:16.562326381Z Collecting proto-plus==1.28.0 (from -r requirements.txt (line 52))
+2026-05-27T13:42:16.574929866Z   Downloading proto_plus-1.28.0-py3-none-any.whl.metadata (2.2 kB)
+2026-05-27T13:42:16.7635829Z Collecting protobuf==5.29.6 (from -r requirements.txt (line 53))
+2026-05-27T13:42:16.776192525Z   Downloading protobuf-5.29.6-cp38-abi3-manylinux2014_x86_64.whl.metadata (592 bytes)
+2026-05-27T13:42:16.799923621Z Collecting pyasn1==0.6.3 (from -r requirements.txt (line 54))
+2026-05-27T13:42:16.812649878Z   Downloading pyasn1-0.6.3-py3-none-any.whl.metadata (8.4 kB)
+2026-05-27T13:42:16.83324972Z Collecting pyasn1_modules==0.4.2 (from -r requirements.txt (line 55))
+2026-05-27T13:42:16.845664111Z   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+2026-05-27T13:42:16.860199601Z Collecting pycparser==3.0 (from -r requirements.txt (line 56))
+2026-05-27T13:42:16.87253664Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+2026-05-27T13:42:16.979454571Z Collecting pydantic==2.13.4 (from -r requirements.txt (line 57))
+2026-05-27T13:42:16.991957414Z   Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+2026-05-27T13:42:17.634571781Z Collecting pydantic_core==2.46.4 (from -r requirements.txt (line 58))
+2026-05-27T13:42:17.647662447Z   Downloading pydantic_core-2.46.4-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+2026-05-27T13:42:17.676458911Z Collecting Pygments==2.20.0 (from -r requirements.txt (line 59))
+2026-05-27T13:42:17.688889592Z   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+2026-05-27T13:42:17.726679646Z Collecting PyJWT==2.13.0 (from -r requirements.txt (line 60))
+2026-05-27T13:42:17.739000964Z   Downloading pyjwt-2.13.0-py3-none-any.whl.metadata (3.4 kB)
+2026-05-27T13:42:17.784076399Z Collecting pyparsing==3.3.2 (from -r requirements.txt (line 61))
+2026-05-27T13:42:17.796321436Z   Downloading pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+2026-05-27T13:42:18.014710716Z Collecting PyYAML==6.0.3 (from -r requirements.txt (line 62))
+2026-05-27T13:42:18.027538026Z   Downloading pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-05-27T13:42:18.106611526Z Collecting requests==2.34.2 (from -r requirements.txt (line 63))
+2026-05-27T13:42:18.119121939Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-05-27T13:42:18.220328657Z Collecting rich==15.0.0 (from -r requirements.txt (line 64))
+2026-05-27T13:42:18.232454031Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+2026-05-27T13:42:18.332764268Z Collecting shellingham==1.5.4 (from -r requirements.txt (line 65))
+2026-05-27T13:42:18.345499806Z   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+2026-05-27T13:42:18.405749686Z Collecting sniffio==1.3.1 (from -r requirements.txt (line 66))
+2026-05-27T13:42:18.418593657Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+2026-05-27T13:42:18.679568324Z Collecting tenacity==9.1.4 (from -r requirements.txt (line 67))
+2026-05-27T13:42:18.692075336Z   Downloading tenacity-9.1.4-py3-none-any.whl.metadata (1.2 kB)
+2026-05-27T13:42:18.778769995Z Collecting tqdm==4.67.3 (from -r requirements.txt (line 68))
+2026-05-27T13:42:18.791494552Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+2026-05-27T13:42:19.084198432Z Collecting typer==0.26.0 (from -r requirements.txt (line 69))
+2026-05-27T13:42:19.096620582Z   Downloading typer-0.26.0-py3-none-any.whl.metadata (16 kB)
+2026-05-27T13:42:19.166096178Z Collecting typing-inspection==0.4.2 (from -r requirements.txt (line 70))
+2026-05-27T13:42:19.178513439Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+2026-05-27T13:42:19.260343143Z Collecting typing_extensions==4.15.0 (from -r requirements.txt (line 71))
+2026-05-27T13:42:19.273182604Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+2026-05-27T13:42:19.345848754Z Collecting uritemplate==4.2.0 (from -r requirements.txt (line 72))
+2026-05-27T13:42:19.358618873Z   Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+2026-05-27T13:42:19.456501033Z Collecting urllib3==2.7.0 (from -r requirements.txt (line 73))
+2026-05-27T13:42:19.469074887Z   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+2026-05-27T13:42:19.700215366Z Collecting websockets==16.0 (from -r requirements.txt (line 74))
+2026-05-27T13:42:19.713174139Z   Downloading websockets-16.0-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)
+2026-05-27T13:42:19.859555024Z Collecting Werkzeug==3.1.8 (from -r requirements.txt (line 75))
+2026-05-27T13:42:19.872443026Z   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+2026-05-27T13:42:20.633843482Z INFO: pip is looking at multiple versions of google-api-core[grpc] to determine which version is compatible with other requirements. This could take a while.
+2026-05-27T13:42:20.656905302Z ERROR: Cannot install google-api-core[grpc]==2.30.3 and grpcio-status==1.71.2 because these package versions have conflicting dependencies.
+2026-05-27T13:42:20.657310851Z 
+2026-05-27T13:42:20.657319522Z The conflict is caused by:
+2026-05-27T13:42:20.657324442Z     The user requested grpcio-status==1.71.2
+2026-05-27T13:42:20.657330582Z     google-api-core[grpc] 2.30.3 depends on grpcio-status<2.0.0 and >=1.33.2; extra == "grpc"
+2026-05-27T13:42:20.657338012Z     google-api-core[grpc] 2.30.3 depends on grpcio-status<2.0.0 and >=1.49.1; python_version >= "3.11" and extra == "grpc"
+2026-05-27T13:42:20.657344852Z     google-api-core[grpc] 2.30.3 depends on grpcio-status<2.0.0 and >=1.75.1; python_version >= "3.14" and extra == "grpc"
+2026-05-27T13:42:20.657350672Z 
+2026-05-27T13:42:20.657356683Z Additionally, some packages in these conflicts have no matching distributions available for your environment:
+2026-05-27T13:42:20.657363203Z     grpcio-status
+2026-05-27T13:42:20.657368173Z 
+2026-05-27T13:42:20.657372423Z To fix this you could try to:
+2026-05-27T13:42:20.657376723Z 1. loosen the range of package versions you've specified
+2026-05-27T13:42:20.657380803Z 2. remove package versions to allow pip to attempt to solve the dependency conflict
+2026-05-27T13:42:20.657384603Z 
+2026-05-27T13:42:20.900146674Z 
+2026-05-27T13:42:20.900161684Z [notice] A new release of pip is available: 25.3 -> 26.1.1
+2026-05-27T13:42:20.900174145Z [notice] To update, run: pip install --upgrade pip
+2026-05-27T13:42:20.900643795Z ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+2026-05-27T13:42:21.693369775Z ==> Build failed 😞
+2026-05-27T13:42:21.693387395Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
