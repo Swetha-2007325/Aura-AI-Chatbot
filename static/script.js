@@ -8,6 +8,14 @@ const newChatBtn  = document.getElementById("newChatBtn");
 const historyList = document.getElementById("historyList");
 const topbarTitle = document.getElementById("topbarTitle");
 
+// Simple UUID generator that works in any context (no HTTPS required)
+function makeId() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
 // In-memory sessions: [{conv_id, title, messages:[]}]
 // Seeded from the server on page load, then updated as the user chats.
 let chatSessions = [];
@@ -94,7 +102,7 @@ async function sendMessage() {
 
   // Start a new conversation if none is active
   if (!currentConvId) {
-    currentConvId = crypto.randomUUID();  // unique ID for this thread
+    currentConvId = makeId();  // unique ID for this thread
     chatSessions.unshift({
       conv_id:  currentConvId,
       title:    text.slice(0, 42),
